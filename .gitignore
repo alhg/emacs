@@ -2,4 +2,5 @@ auto-save-list/
 elpa/
 eshell/
 ido.last
+server/
 transient/
