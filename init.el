@@ -28,6 +28,8 @@
 ;; Theme
 ;; modus-operandi-theme (light)
 ;; modus-vivendi-theme (dark)
+;; vscode-dark-plus-theme
+;; naysayer-theme
 (use-package modus-vivendi-theme
   :ensure t
   :diminish
@@ -80,15 +82,57 @@
    ("C-k" . crux-smart-kill-line)         ;; kills up to end of line, then kills whole line if used again
    ("C-c i" . crux-find-user-init-file))) ;; opens new buffer to init.el file
 
-;; ido stuff
-(ido-mode 1)
-(setq ido-enable-flex-matching t)
-(setq ido-everywhere t)
-(setq ido-create-new-buffer 'always) ;; stop ido from asking for permission for new buffers
+;; completion matching
+(use-package icomplete-vertical
+  :ensure t
+  :diminish
+  :demand t
+  :custom
+  (completion-styles '(partial-completion substring))
+  (completion-category-overrides '((file (styles basic substring))))
+  (read-file-name-completion-ignore-case t)
+  (read-buffer-completion-ignore-case t)
+  (completion-ignore-case t)
+  :config
+  (icomplete-mode)
+  (icomplete-vertical-mode)
+  (fido-mode 1)
+  :bind (:map icomplete-minibuffer-map
+              ("<down>" . icomplete-forward-completions)
+              ("C-n" . icomplete-forward-completions)
+              ("<up>" . icomplete-backward-completions)
+              ("C-p" . icomplete-backward-completions)
+              ("C-v" . icomplete-vertical-toggle)))
 
 ;; c/c++ stuff
 (setq c-default-style "k&r")
 (setq-default c-basic-offset 4)
+
+;; rust stuff
+(use-package rustic
+  :ensure
+  ;; :bind (:map rustic-mode-map
+  ;;             ("M-j" . lsp-ui-imenu)
+  ;;             ("M-?" . lsp-find-references)
+  ;;             ("C-c C-c l" . flycheck-list-errors)
+  ;;             ("C-c C-c a" . lsp-execute-code-action)
+  ;;             ("C-c C-c r" . lsp-rename)
+  ;;             ("C-c C-c q" . lsp-workspace-restart)
+  ;;             ("C-c C-c Q" . lsp-workspace-shutdown)
+  ;;             ("C-c C-c s" . lsp-rust-analyzer-status))
+  :config
+  ;; uncomment for less flashiness
+  ;; (setq lsp-eldoc-hook nil)
+  ;; (setq lsp-enable-symbol-highlighting nil)
+  ;; (setq lsp-signature-auto-activate nil)
+
+  ;; comment to disable rustfmt on save
+  (setq rustic-format-on-save t)
+  (add-hook 'rustic-mode-hook 'rk/rustic-mode-hook))
+
+(defun rk/rustic-mode-hook ()
+  ;; so that run C-c C-c C-r works without having to confirm
+  (setq-local buffer-save-without-query t))
 
 ;; Windows stuff
 (cond ((string-equal system-type "windows-nt")
@@ -105,8 +149,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(fido-mode t)
  '(package-selected-packages
-   '(crux which-key diminish use-package modus-vivendi-theme magit)))
+   '(rustic icomplete-vertical crux which-key diminish use-package modus-vivendi-theme magit)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
