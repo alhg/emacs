@@ -21,6 +21,10 @@
 (use-package diminish
   :ensure t)
 
+;; place emacs generated custom settings to another file
+(setq custom-file (concat user-emacs-directory "custom.el"))
+(load custom-file 'noerror)
+
 ;; Best git interface
 (use-package magit
   :ensure t)
@@ -35,13 +39,6 @@
   :diminish
   :config
   (load-theme 'modus-vivendi t))
-
-;; show all possible keyboard shortcuts
-(use-package which-key
-  :ensure t
-  :diminish
-  :config
-  (which-key-mode))
 
 ;; Font
 ;; Go Mono is a really nice serif monospace font, use if available
@@ -61,14 +58,22 @@
 (setq visible-bell 1)
 (setq make-backup-files nil)
 (setq auto-save-default nil)
-(fset 'yes-or-no-p 'y-or-n-p)
+(fset 'yes-or-no-p 'y-or-n-p) ;; simplify Yes/No Prompts
 
 (transient-mark-mode 1)
 (global-display-line-numbers-mode)
 (show-paren-mode 1)
 
+;; show extra information on modeline
 (setq-default column-number-mode t)
 (display-time)
+
+;; show all possible keyboard shortcuts
+(use-package which-key
+  :ensure t
+  :diminish
+  :config
+  (which-key-mode))
 
 ;; keybindings
 (global-set-key (kbd "M-n") #'forward-paragraph)
@@ -84,9 +89,9 @@
 
 ;; completion matching
 (use-package icomplete-vertical
-  :ensure t
+  :ensure
   :diminish
-  :demand t
+  :demand
   :custom
   (completion-styles '(partial-completion substring))
   (completion-category-overrides '((file (styles basic substring))))
@@ -103,6 +108,9 @@
               ("<up>" . icomplete-backward-completions)
               ("C-p" . icomplete-backward-completions)
               ("C-v" . icomplete-vertical-toggle)))
+
+;; compilation
+(setq compilation-scroll-output 'first-error)
 
 ;; c/c++ stuff
 (setq c-default-style "k&r")
@@ -134,6 +142,61 @@
   ;; so that run C-c C-c C-r works without having to confirm
   (setq-local buffer-save-without-query t))
 
+;; sml
+(use-package sml-mode
+  :ensure)
+
+;; zig
+(use-package zig-mode
+  :defer t
+  :mode ("\\.zig\\'" . zig-mode))
+
+;; lsp stuff
+(use-package lsp-mode
+  :ensure
+  :commands lsp
+  :custom
+  ;; what to use when checking on-save. "check" is default, I prefer clippy
+  (lsp-rust-analyzer-cargo-watch-command "clippy")
+  (lsp-eldoc-render-all t)
+  (lsp-idle-delay 0.6)
+  (lsp-rust-analyzer-server-display-inlay-hints t)
+  :config
+  (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+
+(use-package lsp-ui
+  :ensure
+  :diminish
+  :commands lsp-ui-mode
+  :custom
+  (lsp-ui-peek-always-show t)
+  (lsp-ui-sideline-show-hover t)
+  (lsp-ui-doc-enable nil))
+
+;; code completion
+(use-package company
+  :ensure
+  :diminish
+  :custom
+  (company-idle-delay 0.5) ;; how long to wait until popup
+  ;; (company-begin-commands nil) ;; uncomment to disable popup
+  :bind
+  (:map company-active-map
+	      ("C-n". company-select-next)
+	      ("C-p". company-select-previous)
+	      ("M-<". company-select-first)
+	      ("M->". company-select-last)))
+
+;; macOS stuff
+(when (string-equal system-type 'darwin)
+  (progn
+    ;; sets option key to 'alt, command key to 'meta
+    (setq mac-option-modifier 'alt
+	  mac-right-option-modifier 'alt
+	  mac-command-modifier 'meta)
+    ;; sets fn-delete to be right-delete
+    (global-set-key [kp-delete] 'delete-char))) 
+
 ;; Windows stuff
 (cond ((string-equal system-type "windows-nt")
        (progn
@@ -142,19 +205,3 @@
 	(setenv "HOME" "c:/Users/Allan Hoang")
 	(setq default-directory "~/")
 	(setq delete-by-moving-to-trash t))))
-
-;; Custom stuff
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(fido-mode t)
- '(package-selected-packages
-   '(rustic icomplete-vertical crux which-key diminish use-package modus-vivendi-theme magit)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
