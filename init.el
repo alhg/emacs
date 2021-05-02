@@ -109,6 +109,14 @@
               ("C-p" . icomplete-backward-completions)
               ("C-v" . icomplete-vertical-toggle)))
 
+(use-package company
+  :ensure
+  :diminish
+  :custom
+  (setq company-idle-delay 0)
+  (setq company-minimum-prefix-length 1)
+  )
+
 ;; compilation
 (setq compilation-scroll-output 'first-error)
 
@@ -116,21 +124,35 @@
 (setq c-default-style "k&r")
 (setq-default c-basic-offset 4)
 
+;; d stuff
+(use-package d-mode
+  :ensure)
+
+;; go stuff
+(use-package go-mode
+  :ensure)
+
+;; Go - lsp-mode
+;; Set up before-save hooks to format buffer and add/delete imports.
+(defun lsp-go-install-save-hooks ()
+  (add-hook 'before-save-hook #'lsp-format-buffer t t)
+  (add-hook 'before-save-hook #'lsp-organize-imports t t))
+
 ;; rust stuff
 (use-package rustic
   :ensure
-  ;; :bind (:map rustic-mode-map
-  ;;             ("M-j" . lsp-ui-imenu)
-  ;;             ("M-?" . lsp-find-references)
-  ;;             ("C-c C-c l" . flycheck-list-errors)
-  ;;             ("C-c C-c a" . lsp-execute-code-action)
-  ;;             ("C-c C-c r" . lsp-rename)
-  ;;             ("C-c C-c q" . lsp-workspace-restart)
-  ;;             ("C-c C-c Q" . lsp-workspace-shutdown)
-  ;;             ("C-c C-c s" . lsp-rust-analyzer-status))
+  :bind (:map rustic-mode-map
+              ("M-j" . lsp-ui-imenu)
+              ("M-?" . lsp-find-references)
+              ("C-c C-c l" . flycheck-list-errors)
+              ("C-c C-c a" . lsp-execute-code-action)
+              ("C-c C-c r" . lsp-rename)
+              ("C-c C-c q" . lsp-workspace-restart)
+              ("C-c C-c Q" . lsp-workspace-shutdown)
+              ("C-c C-c s" . lsp-rust-analyzer-status))
   :config
   ;; uncomment for less flashiness
-  ;; (setq lsp-eldoc-hook nil)
+  (setq lsp-eldoc-hook nil)
   ;; (setq lsp-enable-symbol-highlighting nil)
   ;; (setq lsp-signature-auto-activate nil)
 
@@ -162,7 +184,12 @@
   (lsp-idle-delay 0.6)
   (lsp-rust-analyzer-server-display-inlay-hints t)
   :config
-  (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+  (add-hook 'lsp-mode-hook 'lsp-ui-mode)
+
+  ;; go setup
+  (add-hook 'go-mode-hook #'lsp-deferred)
+  (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
+  )
 
 (use-package lsp-ui
   :ensure

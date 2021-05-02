@@ -4,3 +4,8 @@ eshell/
 ido.last
 server/
 transient/
+url/
+
+.lsp-session-v1
+
+custom.el
