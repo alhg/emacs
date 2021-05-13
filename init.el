@@ -43,7 +43,7 @@
 ;; Font
 ;; Go Mono is a really nice serif monospace font, use if available
 (when (member "Go Mono" (font-family-list))
-  (set-frame-font "Go Mono-12" nil t))
+  (set-frame-font "Go Mono-14" nil t))
 
 ;; turn off UI stuff
 (menu-bar-mode -1)
@@ -55,10 +55,11 @@
       inhibit-startup-echo-area-message t)
 
 ;; turn off annoyances
-(setq visible-bell 1)
+(setq ring-bell-function 'ignore) ;; turn off all bells
+;;(setq visible-bell nil)         ;; toggle between audio/video bells
 (setq make-backup-files nil)
 (setq auto-save-default nil)
-(fset 'yes-or-no-p 'y-or-n-p) ;; simplify Yes/No Prompts
+(fset 'yes-or-no-p 'y-or-n-p)     ;; simplify Yes/No Prompts
 
 (transient-mark-mode 1)
 (global-display-line-numbers-mode)
