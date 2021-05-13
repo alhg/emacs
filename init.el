@@ -17,6 +17,10 @@
   (defvar use-package-verbose t)
   (require 'use-package))
 
+;; have emacs autogenerate compile files when it loads a new .elc file
+;; will freeze emacs when it is compiling
+(setq comp-deferred-compilation t)
+
 ;; diminish is used on packages to remove/change minor mode strings in modeline
 (use-package diminish
   :ensure t)
