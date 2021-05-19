@@ -1,3 +1,4 @@
+# directories
 auto-save-list/
 eln-cache/
 elpa/
@@ -7,6 +8,8 @@ server/
 transient/
 url/
 
-.lsp-session-v1
 
+# files
+.lsp-session-v1
 custom.el
+history
