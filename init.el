@@ -1,10 +1,13 @@
-;; this init.el assumes you are using emacs 28+
+;;; init.el --- Initialization file for Emacs
 
-;; Add melpa to the package list and initialize our packages
+;;; Commentary:
+;; this init.el assumes you are using Emacs 28+ with list compilation
+
+;;; Code:
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
-			  ("org" . "https://orgmode.org/elpa/")
-			  ("elpa" . "https://elpa.gnu.org/packages/")))
+			 ("org" . "https://orgmode.org/elpa/")
+			 ("elpa" . "https://elpa.gnu.org/packages/")))
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
@@ -49,12 +52,12 @@
   (savehist-mode))
 
 ;; package for extra info on completion menu, cannot find package?
- (use-package marginalia
-   :after vertico
-   :ensure t
-;;   :custom
-;;   (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
-   :init
+(use-package marginalia
+  :after vertico
+  :ensure t
+  :custom
+  (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
+  :init
   (marginalia-mode))
 
 ;; Best git interface
@@ -75,7 +78,7 @@
 ;; Font
 ;; Go Mono is a really nice serif monospace font, use if available
 (when (member "Go Mono" (font-family-list))
-  (set-frame-font "Go Mono-14" nil t))
+  (set-frame-font "Go Mono-12" nil t))
 
 ;; turn off UI stuff
 (menu-bar-mode -1)
@@ -86,6 +89,9 @@
 (setq inhibit-splash-screen t
       inhibit-startup-echo-area-message t)
 
+;; ask before killing emacs
+(setq confirm-kill-emacs 'y-or-n-p)
+
 ;; turn off annoyances
 (setq ring-bell-function 'ignore) ;; turn off all bells
 ;;(setq visible-bell nil)         ;; toggle between audio/video bells
@@ -94,12 +100,22 @@
 (fset 'yes-or-no-p 'y-or-n-p)     ;; simplify Yes/No Prompts
 
 (transient-mark-mode 1)
-(global-display-line-numbers-mode)
 (show-paren-mode 1)
+
+;; display line numbers for text and programming mode buffers only
+(add-hook 'text-mode-hook #'display-line-numbers-mode)
+(add-hook 'prog-mode-hook #'display-line-numbers-mode)
 
 ;; show extra information on modeline
 (setq-default column-number-mode t)
 (display-time)
+
+;; make cursor the width of the character it is under
+;; i.e. full width of a TAB
+(setq x-stretch-cursor t)
+
+;; change the recenter-top-bottom behavior to leave lines when on top or bottom
+(setq scroll-margin 3)
 
 ;; show all possible keyboard shortcuts
 (use-package which-key
@@ -120,7 +136,7 @@
    ("C-k" . crux-smart-kill-line)         ;; kills up to end of line, then kills whole line if used again
    ("C-c i" . crux-find-user-init-file))) ;; opens new buffer to init.el file
 
-;; ;; completion matching
+;; ;; completion matching (icomplete-vertical is built-in to emacs)
 ;; (use-package icomplete-vertical
 ;;   :ensure
 ;;   :diminish
@@ -142,6 +158,11 @@
 ;;               ("C-p" . icomplete-backward-completions)
 ;;               ("C-v" . icomplete-vertical-toggle)))
 
+(use-package flycheck
+  :ensure t
+  :init
+  (global-flycheck-mode))
+
 ;; compilation settings
 (setq compilation-scroll-output 'first-error) ;; always scroll to the first error
 
@@ -155,13 +176,24 @@
 
 ;; go stuff
 (use-package go-mode
-  :ensure)
+  :ensure t
+  :init
+  (add-hook 'before-save-hook 'gofmt-before-save))
 
 ;; Go - lsp-mode
 ;; Set up before-save hooks to format buffer and add/delete imports.
 (defun lsp-go-install-save-hooks ()
   (add-hook 'before-save-hook #'lsp-format-buffer t t)
   (add-hook 'before-save-hook #'lsp-organize-imports t t))
+
+;; python stuff
+(setq python-shell-interpreter "python3"
+      python-shell-interpreter-args "-i")
+
+(use-package elpy
+  :ensure t
+  :init
+  (elpy-enable))
 
 ;; rust stuff
 (use-package rustic
@@ -234,14 +266,15 @@
   ;; (company-begin-commands nil) ;; uncomment to disable popup
   :bind
   (:map company-active-map
-	      ("C-n". company-select-next)
-	      ("C-p". company-select-previous)
-	      ("M-<". company-select-first)
-	      ("M->". company-select-last)))
+	("C-n". company-select-next)
+	("C-p". company-select-previous)
+	("M-<". company-select-first)
+	("M->". company-select-last)))
 
 (use-package nov
   :ensure t
-  :init
+  :config
+  (setq nov-text-width 80)
   (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
 
 ;; macOS stuff
@@ -252,13 +285,15 @@
 	  mac-right-option-modifier 'alt
 	  mac-command-modifier 'meta)
     ;; sets fn-delete to be right-delete
-    (global-set-key [kp-delete] 'delete-char))) 
+    (global-set-key [kp-delete] 'delete-char)))
 
 ;; Windows stuff
 (cond ((string-equal system-type "windows-nt")
        (progn
-	(when (member "Consolas" (font-family-list))
-	  (set-frame-font "Consolas-12" nil t))
-	(setenv "HOME" "c:/Users/Allan Hoang")
-	(setq default-directory "~/")
-	(setq delete-by-moving-to-trash t))))
+	 (when (member "Consolas" (font-family-list))
+	   (set-frame-font "Consolas-12" nil t))
+	 (setenv "HOME" "c:/Users/Allan Hoang")
+	 (setq default-directory "~/")
+	 (setq delete-by-moving-to-trash t))))
+
+;;; init.el ends here
