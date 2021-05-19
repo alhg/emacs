@@ -1,16 +1,20 @@
-;; this init.el assumes you are using emacs 27+
+;; this init.el assumes you are using emacs 28+
 
 ;; Add melpa to the package list and initialize our packages
 (require 'package)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+			  ("org" . "https://orgmode.org/elpa/")
+			  ("elpa" . "https://elpa.gnu.org/packages/")))
 (package-initialize)
+(unless package-archive-contents
+  (package-refresh-contents))
 
 ;; setup use-package, which is a nicer way of organizing config
 (unless (package-installed-p 'use-package)
-  (package-refresh-contents)
   (package-install 'use-package))
 
 ;; Configure and load use-package
+(require 'use-package)
 (setq use-package-always-ensure t)
 
 (eval-when-compile
@@ -28,6 +32,30 @@
 ;; place emacs generated custom settings to another file
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file 'noerror)
+
+(use-package command-log-mode)
+
+;; lightweight completion package that uses emac's
+;; completion engine
+(use-package vertico
+  :ensure t
+  :custom
+  (vertico-cycle t)
+  :init
+  (vertico-mode))
+
+(use-package savehist
+  :init
+  (savehist-mode))
+
+;; package for extra info on completion menu, cannot find package?
+ (use-package marginalia
+   :after vertico
+   :ensure t
+;;   :custom
+;;   (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
+   :init
+  (marginalia-mode))
 
 ;; Best git interface
 (use-package magit
@@ -92,38 +120,30 @@
    ("C-k" . crux-smart-kill-line)         ;; kills up to end of line, then kills whole line if used again
    ("C-c i" . crux-find-user-init-file))) ;; opens new buffer to init.el file
 
-;; completion matching
-(use-package icomplete-vertical
-  :ensure
-  :diminish
-  :demand
-  :custom
-  (completion-styles '(partial-completion substring))
-  (completion-category-overrides '((file (styles basic substring))))
-  (read-file-name-completion-ignore-case t)
-  (read-buffer-completion-ignore-case t)
-  (completion-ignore-case t)
-  :config
-  (icomplete-mode)
-  (icomplete-vertical-mode)
-  (fido-mode 1)
-  :bind (:map icomplete-minibuffer-map
-              ("<down>" . icomplete-forward-completions)
-              ("C-n" . icomplete-forward-completions)
-              ("<up>" . icomplete-backward-completions)
-              ("C-p" . icomplete-backward-completions)
-              ("C-v" . icomplete-vertical-toggle)))
+;; ;; completion matching
+;; (use-package icomplete-vertical
+;;   :ensure
+;;   :diminish
+;;   :demand
+;;   :custom
+;;   (completion-styles '(partial-completion substring))
+;;   (completion-category-overrides '((file (styles basic substring))))
+;;   (read-file-name-completion-ignore-case t)
+;;   (read-buffer-completion-ignore-case t)
+;;   (completion-ignore-case t)
+;;   :config
+;;   (icomplete-mode)
+;;   (icomplete-vertical-mode)
+;;   (fido-mode 1)
+;;   :bind (:map icomplete-minibuffer-map
+;;               ("<down>" . icomplete-forward-completions)
+;;               ("C-n" . icomplete-forward-completions)
+;;               ("<up>" . icomplete-backward-completions)
+;;               ("C-p" . icomplete-backward-completions)
+;;               ("C-v" . icomplete-vertical-toggle)))
 
-(use-package company
-  :ensure
-  :diminish
-  :custom
-  (setq company-idle-delay 0)
-  (setq company-minimum-prefix-length 1)
-  )
-
-;; compilation
-(setq compilation-scroll-output 'first-error)
+;; compilation settings
+(setq compilation-scroll-output 'first-error) ;; always scroll to the first error
 
 ;; c/c++ stuff
 (setq c-default-style "k&r")
@@ -218,6 +238,11 @@
 	      ("C-p". company-select-previous)
 	      ("M-<". company-select-first)
 	      ("M->". company-select-last)))
+
+(use-package nov
+  :ensure t
+  :init
+  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
 
 ;; macOS stuff
 (when (string-equal system-type 'darwin)
