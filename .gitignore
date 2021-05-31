@@ -10,7 +10,8 @@ url/
 
 
 # files
-session.*
 .lsp-session-v1
 custom.el
 history
+nov-places
+session.*
