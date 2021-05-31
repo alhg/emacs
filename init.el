@@ -64,16 +64,17 @@
 (use-package magit
   :ensure t)
 
-;; Theme
-;; modus-operandi-theme (light)
-;; modus-vivendi-theme (dark)
+;; Themes
+;; modus-themes
 ;; vscode-dark-plus-theme
 ;; naysayer-theme
-(use-package modus-vivendi-theme
+(use-package modus-themes
   :ensure t
-  :diminish
+  :init
+  (modus-themes-load-themes)
   :config
-  (load-theme 'modus-vivendi t))
+  (modus-themes-load-vivendi) ;; OR (modus-themes-load-vivendi)
+  :bind ("<f5>" . modus-themes-toggle))
 
 ;; Font
 ;; Go Mono is a really nice serif monospace font, use if available
@@ -158,10 +159,12 @@
 ;;               ("C-p" . icomplete-backward-completions)
 ;;               ("C-v" . icomplete-vertical-toggle)))
 
-(use-package flycheck
-  :ensure t
-  :init
-  (global-flycheck-mode))
+;;(use-package flycheck
+;;  :ensure t
+;;  :init
+;;  (global-flycheck-mode)
+;;  :config
+;;  (setq flycheck-global-modes '(not c-mode))
 
 ;; compilation settings
 (setq compilation-scroll-output 'first-error) ;; always scroll to the first error
@@ -169,6 +172,10 @@
 ;; c/c++ stuff
 (setq c-default-style "k&r")
 (setq-default c-basic-offset 4)
+
+;; have syntax highlighting up to modern C++20
+(use-package modern-cpp-font-lock
+  :ensure t)
 
 ;; d stuff
 (use-package d-mode
@@ -185,6 +192,10 @@
 (defun lsp-go-install-save-hooks ()
   (add-hook 'before-save-hook #'lsp-format-buffer t t)
   (add-hook 'before-save-hook #'lsp-organize-imports t t))
+
+;; lua stuff
+(use-package lua-mode
+  :ensure t)
 
 ;; python stuff
 (setq python-shell-interpreter "python3"
