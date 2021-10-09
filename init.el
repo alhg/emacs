@@ -1,9 +1,3 @@
-;;; init.el --- Initialization file for Emacs
-
-;;; Commentary:
-;; this init.el assumes you are using Emacs 28+ with list compilation
-
-;;; Code:
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
 			 ("org" . "https://orgmode.org/elpa/")
@@ -24,10 +18,6 @@
   (defvar use-package-verbose t)
   (require 'use-package))
 
-;; have emacs autogenerate compile files when it loads a new .elc file
-;; will freeze emacs when it is compiling
-(setq comp-deferred-compilation t)
-
 ;; diminish is used on packages to remove/change minor mode strings in modeline
 (use-package diminish
   :ensure t)
@@ -36,7 +26,7 @@
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file 'noerror)
 
-(use-package command-log-mode)
+;; (use-package command-log-mode)
 
 ;; lightweight completion package that uses emac's
 ;; completion engine
@@ -63,23 +53,6 @@
 ;; Best git interface
 (use-package magit
   :ensure t)
-
-;; Themes
-;; modus-themes
-;; vscode-dark-plus-theme
-;; naysayer-theme
-(use-package modus-themes
-  :ensure t
-  :init
-  (modus-themes-load-themes)
-  :config
-  (modus-themes-load-vivendi) ;; OR (modus-themes-load-vivendi)
-  :bind ("<f5>" . modus-themes-toggle))
-
-;; Font
-;; Go Mono is a really nice serif monospace font, use if available
-(when (member "Go Mono" (font-family-list))
-  (set-frame-font "Go Mono-12" nil t))
 
 ;; turn off UI stuff
 (menu-bar-mode -1)
@@ -133,9 +106,12 @@
 (use-package crux
   :ensure t
   :bind
-  (("C-a" . crux-move-beginning-of-line)  ;; goes to beginning of line of first char, then column 0 if used again
-   ("C-k" . crux-smart-kill-line)         ;; kills up to end of line, then kills whole line if used again
-   ("C-c i" . crux-find-user-init-file))) ;; opens new buffer to init.el file
+   ;; goes to beginning of line of first char, then column 0 if used again
+  (("C-a" . crux-move-beginning-of-line)
+   ;; kills up to end of line, then kills whole line if used again
+   ("C-k" . crux-smart-kill-line)
+   ;; opens new buffer to init.el file
+   ("C-c i" . crux-find-user-init-file)))
 
 ;; ;; completion matching (icomplete-vertical is built-in to emacs)
 ;; (use-package icomplete-vertical
@@ -178,8 +154,8 @@
   :ensure t)
 
 ;; d stuff
-(use-package d-mode
-  :ensure)
+;;(use-package d-mode
+;;  :ensure)
 
 ;; go stuff
 (use-package go-mode
@@ -230,11 +206,11 @@
 
 (defun rk/rustic-mode-hook ()
   ;; so that run C-c C-c C-r works without having to confirm
-  (setq-local buffer-save-without-query t))
+ (setq-local buffer-save-without-query t))
 
 ;; sml
-(use-package sml-mode
-  :ensure)
+;;(use-package sml-mode
+;;  :ensure)
 
 ;; zig
 (use-package zig-mode
@@ -256,8 +232,7 @@
 
   ;; go setup
   (add-hook 'go-mode-hook #'lsp-deferred)
-  (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
-  )
+  (add-hook 'go-mode-hook #'lsp-go-install-save-hooks))
 
 (use-package lsp-ui
   :ensure
@@ -288,6 +263,21 @@
   (setq nov-text-width 80)
   (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
 
+;; Themes
+;; modus-themes
+;; vscode-dark-plus-theme
+;; naysayer-theme
+(use-package modus-themes
+  :ensure t
+  :init
+  (modus-themes-load-themes)
+  :config
+  (modus-themes-load-vivendi) ;; OR (modus-themes-load-vivendi)
+  :bind ("<f5>" . modus-themes-toggle))
+
+(when (member "Go Mono" (font-family-list))
+  (set-frame-font "Go Mono-12" nil t))
+
 ;; macOS stuff
 (when (string-equal system-type 'darwin)
   (progn
@@ -303,8 +293,6 @@
        (progn
 	 (when (member "Consolas" (font-family-list))
 	   (set-frame-font "Consolas-12" nil t))
-	 (setenv "HOME" "c:/Users/Allan Hoang")
-	 (setq default-directory "~/")
 	 (setq delete-by-moving-to-trash t))))
 
 ;;; init.el ends here

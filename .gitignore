@@ -10,6 +10,7 @@ url/
 
 
 # files
+\#*\#
 .lsp-session-v1
 custom.el
 history

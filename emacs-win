@@ -7,4 +7,7 @@
 (setq user-emacs-directory "C:/path/to/.emacs.d/")
 (setq default-directory "C:/whatever/you/want/to/start/in")
 (setenv "HOME" "C:/my/home/directory")
+;; On windows, use 'mklink \h Link Target' to generete link
+(setenv "HOME" "C:/my/home/directory")
+(setq default-directory "~/")
 (load user-init-file)
