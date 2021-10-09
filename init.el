@@ -54,11 +54,6 @@
 (use-package magit
   :ensure t)
 
-;; turn off UI stuff
-(menu-bar-mode -1)
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
-
 ;; disable startup splash & message buffers
 (setq inhibit-splash-screen t
       inhibit-startup-echo-area-message t)
@@ -276,7 +271,7 @@
   :bind ("<f5>" . modus-themes-toggle))
 
 (when (member "Go Mono" (font-family-list))
-  (set-frame-font "Go Mono-12" nil t))
+  (set-frame-font "Go Mono-14" nil t))
 
 ;; macOS stuff
 (when (string-equal system-type 'darwin)
@@ -289,10 +284,10 @@
     (global-set-key [kp-delete] 'delete-char)))
 
 ;; Windows stuff
-(cond ((string-equal system-type "windows-nt")
-       (progn
-	 (when (member "Consolas" (font-family-list))
-	   (set-frame-font "Consolas-12" nil t))
-	 (setq delete-by-moving-to-trash t))))
+(when (string-equal system-type "windows-nt")
+  (progn
+    (when (member "Consolas" (font-family-list))
+      (set-frame-font "Consolas-12" nil t))
+    (setq delete-by-moving-to-trash t))))
 
 ;;; init.el ends here
