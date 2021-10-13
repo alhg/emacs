@@ -270,8 +270,16 @@
   (modus-themes-load-vivendi) ;; OR (modus-themes-load-vivendi)
   :bind ("<f5>" . modus-themes-toggle))
 
-(when (member "Go Mono" (font-family-list))
-  (set-frame-font "Go Mono-14" nil t))
+;; pulses line of cursor when scrolling, switching windows
+;; uses pulse behind the scene
+;; Used to help locate cursor when moving it
+(use-package beacon
+  :ensure t
+  :config
+  (beacon-mode 1))
+
+(cond ((member "Go Mono" (font-family-list)) (set-frame-font "Go Mono-14" nil t))
+      ((member "Liberation Mono" (font-family-list)) (set-frame-font "Liberation Mono-14" nil t)))
 
 ;; macOS stuff
 (when (string-equal system-type 'darwin)
@@ -286,8 +294,8 @@
 ;; Windows stuff
 (when (string-equal system-type "windows-nt")
   (progn
-    (when (member "Consolas" (font-family-list))
-      (set-frame-font "Consolas-12" nil t))
-    (setq delete-by-moving-to-trash t))))
+    (cond ((member "Go Mono" (font-family-list)) (set-frame-font "Go Mono-14" nil t))
+	  ((member "Consolas" (font-family-list)) (set-frame-font "Consolas-14" nil t)))
+    (setq delete-by-moving-to-trash t)))
 
 ;;; init.el ends here
