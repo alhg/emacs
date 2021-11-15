@@ -30,12 +30,12 @@
 
 ;; lightweight completion package that uses emac's
 ;; completion engine
-(use-package vertico
-  :ensure t
-  :custom
-  (vertico-cycle t)
-  :init
-  (vertico-mode))
+;;(use-package vertico
+;;  :ensure t
+;;  :custom
+;;  (vertico-cycle t)
+;;  :init
+;;  (vertico-mode))
 
 (use-package savehist
   :init
@@ -43,7 +43,7 @@
 
 ;; package for extra info on completion menu, cannot find package?
 (use-package marginalia
-  :after vertico
+  :after icomplete-vertical
   :ensure t
   :custom
   (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
@@ -109,29 +109,29 @@
    ("C-c i" . crux-find-user-init-file)))
 
 ;; ;; completion matching (icomplete-vertical is built-in to emacs)
-;; (use-package icomplete-vertical
-;;   :ensure
-;;   :diminish
-;;   :demand
-;;   :custom
-;;   (completion-styles '(partial-completion substring))
-;;   (completion-category-overrides '((file (styles basic substring))))
-;;   (read-file-name-completion-ignore-case t)
-;;   (read-buffer-completion-ignore-case t)
-;;   (completion-ignore-case t)
-;;   :config
-;;   (icomplete-mode)
-;;   (icomplete-vertical-mode)
-;;   (fido-mode 1)
-;;   :bind (:map icomplete-minibuffer-map
-;;               ("<down>" . icomplete-forward-completions)
-;;               ("C-n" . icomplete-forward-completions)
-;;               ("<up>" . icomplete-backward-completions)
-;;               ("C-p" . icomplete-backward-completions)
-;;               ("C-v" . icomplete-vertical-toggle)))
+(use-package icomplete-vertical
+  :ensure t
+  :diminish
+  :demand
+  :custom
+  (completion-styles '(partial-completion substring))
+  (completion-category-overrides '((file (styles basic substring))))
+  (read-file-name-completion-ignore-case t)
+  (read-buffer-completion-ignore-case t)
+  (completion-ignore-case t)
+  :config
+  (icomplete-mode)
+  (icomplete-vertical-mode)
+  (fido-mode 1)
+  :bind (:map icomplete-minibuffer-map
+              ("<down>" . icomplete-forward-completions)
+              ("C-n" . icomplete-forward-completions)
+              ("<up>" . icomplete-backward-completions)
+              ("C-p" . icomplete-backward-completions)
+              ("C-v" . icomplete-vertical-toggle)))
 
-;;(use-package flycheck
-;;  :ensure t
+(use-package flycheck
+  :ensure t)
 ;;  :init
 ;;  (global-flycheck-mode)
 ;;  :config
@@ -166,20 +166,20 @@
 
 ;; lua stuff
 (use-package lua-mode
-  :ensure t)
+  :defer t)
 
 ;; python stuff
 (setq python-shell-interpreter "python3"
       python-shell-interpreter-args "-i")
 
 (use-package elpy
-  :ensure t
+  :defer t
   :init
   (elpy-enable))
 
 ;; rust stuff
 (use-package rustic
-  :ensure
+  :defer t
   :bind (:map rustic-mode-map
               ("M-j" . lsp-ui-imenu)
               ("M-?" . lsp-find-references)
@@ -192,8 +192,8 @@
   :config
   ;; uncomment for less flashiness
   (setq lsp-eldoc-hook nil)
-  ;; (setq lsp-enable-symbol-highlighting nil)
-  ;; (setq lsp-signature-auto-activate nil)
+  (setq lsp-enable-symbol-highlighting nil)
+  (setq lsp-signature-auto-activate nil)
 
   ;; comment to disable rustfmt on save
   (setq rustic-format-on-save t)
@@ -204,8 +204,8 @@
  (setq-local buffer-save-without-query t))
 
 ;; sml
-;;(use-package sml-mode
-;;  :ensure)
+(use-package sml-mode
+  :defer t)
 
 ;; zig
 (use-package zig-mode
@@ -218,7 +218,7 @@
   :commands lsp
   :custom
   ;; what to use when checking on-save. "check" is default, I prefer clippy
-  (lsp-rust-analyzer-cargo-watch-command "clippy")
+  ;;(lsp-rust-analyzer-cargo-watch-command "clippy")
   (lsp-eldoc-render-all t)
   (lsp-idle-delay 0.6)
   (lsp-rust-analyzer-server-display-inlay-hints t)
@@ -252,6 +252,8 @@
 	("M-<". company-select-first)
 	("M->". company-select-last)))
 
+
+
 (use-package nov
   :ensure t
   :config
@@ -278,8 +280,25 @@
   :config
   (beacon-mode 1))
 
-(cond ((member "Go Mono" (font-family-list)) (set-frame-font "Go Mono-14" nil t))
-      ((member "Liberation Mono" (font-family-list)) (set-frame-font "Liberation Mono-14" nil t)))
+
+(use-package org
+  :config
+  (setq org-startup-indented t)
+  (setq fill-column 80)
+  :hook
+  (auto-fill-mode))
+
+
+(cond ((member "Go Mono" (font-family-list)) (set-frame-font "Go Mono-12" nil t))
+      ((member "Liberation Mono" (font-family-list)) (set-frame-font "Liberation Mono-12" nil t)))
+
+;; linux stuff
+(when (string-equal system-type 'gnu/linux)
+  (progn
+    (use-package pdf-tools
+      :ensure t)
+    (use-package vterm
+      :ensure t)))
 
 ;; macOS stuff
 (when (string-equal system-type 'darwin)
