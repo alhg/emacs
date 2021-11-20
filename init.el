@@ -38,21 +38,26 @@
 ;;  (vertico-mode))
 
 (use-package savehist
-  :init
+  :config
   (savehist-mode))
 
 ;; package for extra info on completion menu, cannot find package?
 (use-package marginalia
   :after icomplete-vertical
-  :ensure t
   :custom
   (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
-  :init
+  :config
   (marginalia-mode))
 
 ;; Best git interface
-(use-package magit
-  :ensure t)
+;; TODO: make magit perform better in very large repos.
+(use-package magit)
+
+;; isearch replacement
+(use-package ctrlf
+  :config
+  (ctrlf-mode +1))
+
 
 ;; disable startup splash & message buffers
 (setq inhibit-splash-screen t
@@ -88,7 +93,6 @@
 
 ;; show all possible keyboard shortcuts
 (use-package which-key
-  :ensure t
   :diminish
   :config
   (which-key-mode))
@@ -99,7 +103,6 @@
 
 ;; Crux, a Collection of Ridiculously Useful eXtensions for Emacs.
 (use-package crux
-  :ensure t
   :bind
    ;; goes to beginning of line of first char, then column 0 if used again
   (("C-a" . crux-move-beginning-of-line)
@@ -130,8 +133,7 @@
               ("C-p" . icomplete-backward-completions)
               ("C-v" . icomplete-vertical-toggle)))
 
-(use-package flycheck
-  :ensure t)
+(use-package flycheck)
 ;;  :init
 ;;  (global-flycheck-mode)
 ;;  :config
@@ -145,18 +147,14 @@
 (setq-default c-basic-offset 4)
 
 ;; have syntax highlighting up to modern C++20
-(use-package modern-cpp-font-lock
-  :ensure t)
+(use-package modern-cpp-font-lockt)
 
 ;; d stuff
-;;(use-package d-mode
-;;  :ensure)
+(use-package d-mode)
 
 ;; go stuff
 (use-package go-mode
-  :ensure t
-  :init
-  (add-hook 'before-save-hook 'gofmt-before-save))
+  :hook (before-save-hook . gofmt-before-save))
 
 ;; Go - lsp-mode
 ;; Set up before-save hooks to format buffer and add/delete imports.
@@ -165,21 +163,18 @@
   (add-hook 'before-save-hook #'lsp-organize-imports t t))
 
 ;; lua stuff
-(use-package lua-mode
-  :defer t)
+(use-package lua-mode)
 
 ;; python stuff
 (setq python-shell-interpreter "python3"
       python-shell-interpreter-args "-i")
 
 (use-package elpy
-  :defer t
-  :init
+  :config
   (elpy-enable))
 
 ;; rust stuff
 (use-package rustic
-  :defer t
   :bind (:map rustic-mode-map
               ("M-j" . lsp-ui-imenu)
               ("M-?" . lsp-find-references)
@@ -204,17 +199,14 @@
  (setq-local buffer-save-without-query t))
 
 ;; sml
-(use-package sml-mode
-  :defer t)
+(use-package sml-mode)
 
 ;; zig
 (use-package zig-mode
-  :defer t
   :mode ("\\.zig\\'" . zig-mode))
 
 ;; lsp stuff
 (use-package lsp-mode
-  :ensure
   :commands lsp
   :custom
   ;; what to use when checking on-save. "check" is default, I prefer clippy
@@ -230,7 +222,6 @@
   (add-hook 'go-mode-hook #'lsp-go-install-save-hooks))
 
 (use-package lsp-ui
-  :ensure
   :diminish
   :commands lsp-ui-mode
   :custom
@@ -240,7 +231,6 @@
 
 ;; code completion
 (use-package company
-  :ensure
   :diminish
   :custom
   (company-idle-delay 0.5) ;; how long to wait until popup
@@ -253,9 +243,7 @@
 	("M->". company-select-last)))
 
 
-
 (use-package nov
-  :ensure t
   :config
   (setq nov-text-width 80)
   (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
@@ -272,14 +260,12 @@
   (modus-themes-load-vivendi) ;; OR (modus-themes-load-vivendi)
   :bind ("<f5>" . modus-themes-toggle))
 
-;; pulses line of cursor when scrolling, switching windows
-;; uses pulse behind the scene
-;; Used to help locate cursor when moving it
+;; Pulses line of cursor when scrolling, switching windows.
+;; Uses built-in pulse package behind the scene
+;; Useful to help locate cursor when moving it
 (use-package beacon
-  :ensure t
   :config
   (beacon-mode 1))
-
 
 (use-package org
   :config
@@ -288,19 +274,13 @@
   :hook
   (auto-fill-mode))
 
-
-(cond ((member "Go Mono" (font-family-list)) (set-frame-font "Go Mono-12" nil t))
-      ((member "Liberation Mono" (font-family-list)) (set-frame-font "Liberation Mono-12" nil t)))
-
-;; linux stuff
+;; Linux specific settings
 (when (string-equal system-type 'gnu/linux)
   (progn
-    (use-package pdf-tools
-      :ensure t)
-    (use-package vterm
-      :ensure t)))
+    (use-package pdf-tools)
+    (use-package vterm)))
 
-;; macOS stuff
+;; macOS specific settings
 (when (string-equal system-type 'darwin)
   (progn
     ;; sets option key to 'alt, command key to 'meta
@@ -310,11 +290,10 @@
     ;; sets fn-delete to be right-delete
     (global-set-key [kp-delete] 'delete-char)))
 
-;; Windows stuff
+;; Windows specific settings
 (when (string-equal system-type "windows-nt")
   (progn
-    (cond ((member "Go Mono" (font-family-list)) (set-frame-font "Go Mono-14" nil t))
-	  ((member "Consolas" (font-family-list)) (set-frame-font "Consolas-14" nil t)))
+    ;; deleting moves it to Window's recycling bin
     (setq delete-by-moving-to-trash t)))
 
 ;;; init.el ends here
