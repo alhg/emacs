@@ -1,6 +1,5 @@
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
-			 ("org" . "https://orgmode.org/elpa/")
 			 ("elpa" . "https://elpa.gnu.org/packages/")))
 (package-initialize)
 (unless package-archive-contents
@@ -19,8 +18,7 @@
   (require 'use-package))
 
 ;; diminish is used on packages to remove/change minor mode strings in modeline
-(use-package diminish
-  :ensure t)
+(use-package diminish)
 
 ;; place emacs generated custom settings to another file
 (setq custom-file (concat user-emacs-directory "custom.el"))
@@ -31,7 +29,6 @@
 ;; lightweight completion package that uses emac's
 ;; completion engine
 ;;(use-package vertico
-;;  :ensure t
 ;;  :custom
 ;;  (vertico-cycle t)
 ;;  :init
@@ -113,7 +110,6 @@
 
 ;; ;; completion matching (icomplete-vertical is built-in to emacs)
 (use-package icomplete-vertical
-  :ensure t
   :diminish
   :demand
   :custom
@@ -147,7 +143,7 @@
 (setq-default c-basic-offset 4)
 
 ;; have syntax highlighting up to modern C++20
-(use-package modern-cpp-font-lockt)
+(use-package modern-cpp-font-lock)
 
 ;; d stuff
 (use-package d-mode)
@@ -253,7 +249,6 @@
 ;; vscode-dark-plus-theme
 ;; naysayer-theme
 (use-package modus-themes
-  :ensure t
   :init
   (modus-themes-load-themes)
   :config
