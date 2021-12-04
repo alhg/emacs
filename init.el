@@ -108,7 +108,11 @@
    ;; opens new buffer to init.el file
    ("C-c i" . crux-find-user-init-file)))
 
-;; ;; completion matching (icomplete-vertical is built-in to emacs)
+(use-package ace-window
+  :config
+  (global-set-key (kbd "M-o") 'ace-window))
+
+;; completion matching (icomplete-vertical is built-in to emacs)
 (use-package icomplete-vertical
   :diminish
   :demand
