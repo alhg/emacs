@@ -209,31 +209,46 @@
 (use-package lsp-mode
   :commands lsp
   :custom
-  ;; what to use when checking on-save. "check" is default, I prefer clippy
-  ;;(lsp-rust-analyzer-cargo-watch-command "clippy")
+  (lsp-keymap-prefix "C-c C-l")
+  (lsp-log-io nil) ;; only turn on if you need to debug lsp
   (lsp-eldoc-render-all t)
   (lsp-idle-delay 0.6)
-  (lsp-rust-analyzer-server-display-inlay-hints t)
+
+  ;; Rust
+  ;; what to use when checking on-save. "check" is default, I prefer clippy
+  (lsp-rust-analyzer-cargo-watch-command "clippy")
+  (lsp-rust-analyzer-display-chaining-hints t)
+  (lsp-rust-analyzer-display-parameter-hints nil) ;; super annoying, interrupts editing
+  (lsp-rust-analyzer-server-display-inlay-hints nil)
+  (lsp-rust-analyzer-macro-expansion-method (quote rustic-analyzer-macro-expand))
+  (lsp-rust-full-docs t)
   :config
+
   (add-hook 'lsp-mode-hook 'lsp-ui-mode)
 
   ;; go setup
   (add-hook 'go-mode-hook #'lsp-deferred)
-  (add-hook 'go-mode-hook #'lsp-go-install-save-hooks))
+  (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
+  :hook
+  (lsp-mode . lsp-enable-which-key-integration))
 
 (use-package lsp-ui
   :diminish
   :commands lsp-ui-mode
   :custom
-  (lsp-ui-peek-always-show t)
-  (lsp-ui-sideline-show-hover t)
-  (lsp-ui-doc-enable nil))
+  ;;(lsp-ui-peek-always-show t)
+  ;;(lsp-ui-sideline-show-hover t)xo
+  (lsp-ui-doc-enable nil)
+  ;;(lsp-ui-doc-alignment (quote window))
+  ;;(lsp-ui-doc-position (quote top))
+  )
 
 ;; code completion
 (use-package company
   :diminish
   :custom
-  (company-idle-delay 0.5) ;; how long to wait until popup
+  (company-minimum-prefix-length 1)
+  (company-idle-delay 0.0) ;; default is 0.2
   ;; (company-begin-commands nil) ;; uncomment to disable popup
   :bind
   (:map company-active-map
@@ -242,6 +257,15 @@
 	("M-<". company-select-first)
 	("M->". company-select-last)))
 
+;; lsp's rust company mode requires yasnippet for code completion
+(use-package yasnippet
+  :diminish
+  :config
+  ;; Need this if we only use yas-minor-mode.
+  ;; Will load the snippet table before yas-minor-mode is called
+  (yas-reload-all)
+  (add-hook 'rustic-mode-hook #'yas-minor-mode)
+  )
 
 (use-package nov
   :config
