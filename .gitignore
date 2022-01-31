@@ -4,7 +4,9 @@ eln-cache/
 elpa/
 eshell/
 ido.last
+packages/
 server/
+racket-mode/
 transient/
 url/
 

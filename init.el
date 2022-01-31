@@ -72,6 +72,7 @@
 
 (transient-mark-mode 1)
 (show-paren-mode 1)
+(setq show-paren-delay 0)
 
 ;; display line numbers for text and programming mode buffers only
 (add-hook 'text-mode-hook #'display-line-numbers-mode)
@@ -172,6 +173,18 @@
 (use-package elpy
   :config
   (elpy-enable))
+
+;; OCaml
+(use-package tuareg)
+
+;; racket
+(use-package racket-mode)
+
+;; create more unique buffer names for duplicates
+(use-package uniquify
+  :ensure nil
+  :config
+  (setq uniquify-buffer-name-style 'post-forward))
 
 ;; rust stuff
 (use-package rustic
@@ -300,7 +313,10 @@
 ;; Linux specific settings
 (when (string-equal system-type 'gnu/linux)
   (progn
-    (use-package pdf-tools)
+    (use-package pdf-tools
+      :config
+      (require 'pdf-continuous-scroll-mode)
+      (add-hook 'pdf-view-mode-hook 'pdf-continuous-scroll-mode))
     (use-package vterm)))
 
 ;; macOS specific settings
