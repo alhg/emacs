@@ -1,3 +1,15 @@
+;; TODOs
+;; - Print Emacs startup time in scratch buffer.
+;; - Allow timer to be set in modeline, when timer ends emacs could flash buffer
+;;   or modeline background color
+;; - Setup Emacs for web development. Currently using vscode, but would like to switch
+;;   - Need to dynamically change exec-path to current project's node_modules.
+;;     Theres a project for it.
+;;   - Eslint, prettier buffer save on format should only work with project's config
+;;   - No tabs when editing js/ts files
+;;   - Setup typescript integration
+
+;;; PACKAGE CONFIGURATION ;;;
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
 			 ("elpa" . "https://elpa.gnu.org/packages/")))
@@ -17,44 +29,20 @@
   (defvar use-package-verbose t)
   (require 'use-package))
 
-;; diminish is used on packages to remove/change minor mode strings in modeline
+;; NOTE on use-package
+;; :init runs code before package is loaded
+;; :config runs code after package is loaded
+;; :ensure installs package if not found on system. Set to nil if its a builtin package
+;; :defer defers loading of package until needed.
+
+;; diminish is used on use-package configuration to remove minior mode strings
+;; from appearing modeline, with :diminish
 (use-package diminish)
 
+;;; GENERAL CONFIGURATION ;;;
 ;; place emacs generated custom settings to another file
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file 'noerror)
-
-;; (use-package command-log-mode)
-
-;; lightweight completion package that uses emac's
-;; completion engine
-;;(use-package vertico
-;;  :custom
-;;  (vertico-cycle t)
-;;  :init
-;;  (vertico-mode))
-
-(use-package savehist
-  :config
-  (savehist-mode))
-
-;; package for extra info on completion menu, cannot find package?
-(use-package marginalia
-  :after icomplete-vertical
-  :custom
-  (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
-  :config
-  (marginalia-mode))
-
-;; Best git interface
-;; TODO: make magit perform better in very large repos.
-(use-package magit)
-
-;; isearch replacement
-(use-package ctrlf
-  :config
-  (ctrlf-mode +1))
-
 
 ;; disable startup splash & message buffers
 (setq inhibit-splash-screen t
@@ -70,13 +58,24 @@
 (setq auto-save-default nil)
 (fset 'yes-or-no-p 'y-or-n-p)     ;; simplify Yes/No Prompts
 
-(transient-mark-mode 1)
-(show-paren-mode 1)
-(setq show-paren-delay 0)
+(transient-mark-mode 1) ;; highlight area when setting mark
+
+(setq blink-cursor-interval 0.5)
+
+(use-package paren
+  ;; highlight matching parens/delimiters
+  :ensure nil
+  :config
+  (setq show-paren-delay 0.1
+	show-paren-highlight-openparen t
+	show-paren-when-point-inside-paren t
+	show-paren-when-point-in-periphery t)
+  (show-paren-mode 1))
 
 ;; display line numbers for text and programming mode buffers only
 (add-hook 'text-mode-hook #'display-line-numbers-mode)
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
+(add-hook 'prog-mode-hook #'hl-line-mode)
 
 ;; show extra information on modeline
 (setq-default column-number-mode t)
@@ -89,13 +88,16 @@
 ;; change the recenter-top-bottom behavior to leave lines when on top or bottom
 (setq scroll-margin 3)
 
-;; show all possible keyboard shortcuts
-(use-package which-key
-  :diminish
-  :config
-  (which-key-mode))
+;; move based on visual lines
+(setq line-move-visual t)
 
-;; keybindings
+;; create more unique buffer names when there are duplicates
+(use-package uniquify
+  :ensure nil
+  :config
+  (setq uniquify-buffer-name-style 'post-forward))
+
+;;; KEYBINDING CONFIGURATIONS ;;;
 (global-set-key (kbd "M-n") #'forward-paragraph)
 (global-set-key (kbd "M-p") #'backward-paragraph)
 
@@ -106,12 +108,15 @@
   (("C-a" . crux-move-beginning-of-line)
    ;; kills up to end of line, then kills whole line if used again
    ("C-k" . crux-smart-kill-line)
+   ("M-o" . crux-other-window-or-switch-buffer)
    ;; opens new buffer to init.el file
    ("C-c i" . crux-find-user-init-file)))
 
-(use-package ace-window
+;; show all possible keyboard shortcuts
+(use-package which-key
+  :diminish
   :config
-  (global-set-key (kbd "M-o") 'ace-window))
+  (which-key-mode))
 
 ;; completion matching (icomplete-vertical is built-in to emacs)
 (use-package icomplete-vertical
@@ -134,6 +139,29 @@
               ("C-p" . icomplete-backward-completions)
               ("C-v" . icomplete-vertical-toggle)))
 
+;; TODO: Do I need this package?
+(use-package savehist
+  :config
+  (savehist-mode))
+
+;; package for extra info on completion menu
+(use-package marginalia
+  :after icomplete-vertical
+  :custom
+  (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
+  :config
+  (marginalia-mode))
+
+;; Best git interface
+;; TODO: make magit perform better in very large repos.
+(use-package magit
+  :defer t)
+
+;; isearch replacement
+(use-package ctrlf
+  :config
+  (ctrlf-mode +1))
+
 (use-package flycheck)
 ;;  :init
 ;;  (global-flycheck-mode)
@@ -151,10 +179,12 @@
 (use-package modern-cpp-font-lock)
 
 ;; d stuff
-(use-package d-mode)
+(use-package d-mode
+  :defer t)
 
 ;; go stuff
 (use-package go-mode
+  :defer t
   :hook (before-save-hook . gofmt-before-save))
 
 ;; Go - lsp-mode
@@ -163,31 +193,30 @@
   (add-hook 'before-save-hook #'lsp-format-buffer t t)
   (add-hook 'before-save-hook #'lsp-organize-imports t t))
 
-;; lua stuff
-(use-package lua-mode)
+;;; LUA CONFIGURATION ;;;
+(use-package lua-mode
+  :defer t)
 
-;; python stuff
+;;; PYTHON CONFIGURATION ;;;
 (setq python-shell-interpreter "python3"
       python-shell-interpreter-args "-i")
 
 (use-package elpy
+  :defer t
   :config
   (elpy-enable))
 
-;; OCaml
-(use-package tuareg)
+;;; OCaml Configuration ;;;
+(use-package tuareg
+  :defer t)
 
-;; racket
-(use-package racket-mode)
-
-;; create more unique buffer names for duplicates
-(use-package uniquify
-  :ensure nil
-  :config
-  (setq uniquify-buffer-name-style 'post-forward))
+;;; racket  Configuration
+(use-package racket-mode
+  :defer t)
 
 ;; rust stuff
 (use-package rustic
+  :defer t
   :bind (:map rustic-mode-map
               ("M-j" . lsp-ui-imenu)
               ("M-?" . lsp-find-references)
@@ -212,10 +241,12 @@
  (setq-local buffer-save-without-query t))
 
 ;; sml
-(use-package sml-mode)
+(use-package sml-mode
+  :defer t)
 
 ;; zig
 (use-package zig-mode
+  :defer t
   :mode ("\\.zig\\'" . zig-mode))
 
 ;; lsp stuff
@@ -246,6 +277,7 @@
   (lsp-mode . lsp-enable-which-key-integration))
 
 (use-package lsp-ui
+  :defer t
   :diminish
   :commands lsp-ui-mode
   :custom
@@ -272,15 +304,16 @@
 
 ;; lsp's rust company mode requires yasnippet for code completion
 (use-package yasnippet
+  :defer t
   :diminish
   :config
   ;; Need this if we only use yas-minor-mode.
   ;; Will load the snippet table before yas-minor-mode is called
   (yas-reload-all)
-  (add-hook 'rustic-mode-hook #'yas-minor-mode)
-  )
+  (add-hook 'rustic-mode-hook #'yas-minor-mode))
 
 (use-package nov
+  :defer t
   :config
   (setq nov-text-width 80)
   (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
@@ -289,19 +322,20 @@
 ;; modus-themes
 ;; vscode-dark-plus-theme
 ;; naysayer-theme
-(use-package modus-themes
-  :init
-  (modus-themes-load-themes)
-  :config
-  (modus-themes-load-vivendi) ;; OR (modus-themes-load-vivendi)
-  :bind ("<f5>" . modus-themes-toggle))
+;; (use-package modus-themes
+;;   :init
+;;   (modus-themes-load-themes)
+;;   :config
+;;   (modus-themes-load-vivendi) ;; OR (modus-themes-load-vivendi)
+;;   :bind ("<f5>" . modus-themes-toggle))
 
-;; Pulses line of cursor when scrolling, switching windows.
-;; Uses built-in pulse package behind the scene
-;; Useful to help locate cursor when moving it
-(use-package beacon
+;; naysayer theme is based on jon blow's theme, I really like it
+;; cause it uses green for comments, which makes it easier to read
+;; than light grey in modus-themes
+(use-package naysayer-theme
   :config
-  (beacon-mode 1))
+  (load-theme 'naysayer t)
+  (set-cursor-color "lightgreen"))
 
 (use-package org
   :config
