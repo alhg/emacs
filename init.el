@@ -314,9 +314,10 @@
 
 (use-package nov
   :defer t
+  :init
+  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
   :config
-  (setq nov-text-width 80)
-  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
+  (setq nov-text-width 80))
 
 ;; Themes
 ;; modus-themes
