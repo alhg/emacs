@@ -79,6 +79,10 @@
 (global-display-line-numbers-mode 1)
 (global-hl-line-mode 1)
 
+;; maximized frame when create
+;;(add-to-list 'initial-frame-alist '(fullscreen . maximized)) ;; only maximize inital frame          
+(add-to-list 'default-frame-alist '(fullscreen . maximized)) ;; maximize all frames created
+
 ;; show extra information on modeline
 (setq-default column-number-mode t)
 (display-time)
