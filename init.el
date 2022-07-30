@@ -12,7 +12,7 @@
 ;;; PACKAGE CONFIGURATION ;;;
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
-			 ("elpa" . "https://elpa.gnu.org/packages/")))
+						 ("elpa" . "https://elpa.gnu.org/packages/")))
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
@@ -39,6 +39,9 @@
 ;; from appearing modeline, with :diminish
 (use-package diminish)
 
+;; Get PATH from shell
+(exec-path-from-shell-initialize)
+
 ;;; GENERAL CONFIGURATION ;;;
 ;; place emacs generated custom settings to another file
 (setq custom-file (concat user-emacs-directory "custom.el"))
@@ -60,22 +63,21 @@
 
 (transient-mark-mode 1) ;; highlight area when setting mark
 
-(setq blink-cursor-interval 0.5)
+(setq blink-cursor-interval 0)
 
 (use-package paren
   ;; highlight matching parens/delimiters
   :ensure nil
   :config
   (setq show-paren-delay 0.1
-	show-paren-highlight-openparen t
-	show-paren-when-point-inside-paren t
-	show-paren-when-point-in-periphery t)
+		show-paren-highlight-openparen t
+		show-paren-when-point-inside-paren t
+		show-paren-when-point-in-periphery t)
   (show-paren-mode 1))
 
 ;; display line numbers for text and programming mode buffers only
-(add-hook 'text-mode-hook #'display-line-numbers-mode)
-(add-hook 'prog-mode-hook #'display-line-numbers-mode)
-(add-hook 'prog-mode-hook #'hl-line-mode)
+(global-display-line-numbers-mode 1)
+(global-hl-line-mode 1)
 
 ;; show extra information on modeline
 (setq-default column-number-mode t)
@@ -104,7 +106,7 @@
 ;; Crux, a Collection of Ridiculously Useful eXtensions for Emacs.
 (use-package crux
   :bind
-   ;; goes to beginning of line of first char, then column 0 if used again
+  ;; goes to beginning of line of first char, then column 0 if used again
   (("C-a" . crux-move-beginning-of-line)
    ;; kills up to end of line, then kills whole line if used again
    ("C-k" . crux-smart-kill-line)
@@ -118,44 +120,29 @@
   :config
   (which-key-mode))
 
-;; completion matching (icomplete-vertical is built-in to emacs)
-(use-package icomplete-vertical
-  :diminish
-  :demand
+;; fido is ido-like mode that has vertical-mode
+(fido-vertical-mode 1)
+
+;; package for extra info on completion menu
+(use-package marginalia
   :custom
-  (completion-styles '(partial-completion substring))
-  (completion-category-overrides '((file (styles basic substring))))
-  (read-file-name-completion-ignore-case t)
-  (read-buffer-completion-ignore-case t)
-  (completion-ignore-case t)
+  (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
   :config
-  (icomplete-mode)
-  (icomplete-vertical-mode)
-  (fido-mode 1)
-  :bind (:map icomplete-minibuffer-map
-              ("<down>" . icomplete-forward-completions)
-              ("C-n" . icomplete-forward-completions)
-              ("<up>" . icomplete-backward-completions)
-              ("C-p" . icomplete-backward-completions)
-              ("C-v" . icomplete-vertical-toggle)))
+  (marginalia-mode))
+
 
 ;; TODO: Do I need this package?
 (use-package savehist
   :config
   (savehist-mode))
 
-;; package for extra info on completion menu
-(use-package marginalia
-  :after icomplete-vertical
-  :custom
-  (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
-  :config
-  (marginalia-mode))
-
 ;; Best git interface
-;; TODO: make magit perform better in very large repos.
 (use-package magit
-  :defer t)
+  :custom
+  (git-commit-summary-max-length 50)
+  (git-commit-fill-column 72)
+  :config
+  (global-git-commit-mode 1))
 
 ;; isearch replacement
 (use-package ctrlf
@@ -172,8 +159,9 @@
 (setq compilation-scroll-output 'first-error) ;; always scroll to the first error
 
 ;; c/c++ stuff
-(setq c-default-style "k&r")
+(setq c-default-style "linux")
 (setq-default c-basic-offset 4)
+(setq-default tab-width 4)
 
 ;; have syntax highlighting up to modern C++20
 (use-package modern-cpp-font-lock)
@@ -184,14 +172,21 @@
 
 ;; go stuff
 (use-package go-mode
-  :defer t
-  :hook (before-save-hook . gofmt-before-save))
+  :hook (before-save . gofmt-before-save))
 
 ;; Go - lsp-mode
 ;; Set up before-save hooks to format buffer and add/delete imports.
 (defun lsp-go-install-save-hooks ()
   (add-hook 'before-save-hook #'lsp-format-buffer t t)
   (add-hook 'before-save-hook #'lsp-organize-imports t t))
+
+;;; JAVA CONFIGURATION ;;;
+;; setting indent-tabs-mode to nil will have spaces for indentation
+(add-hook 'java-mode-hook
+		  (lambda ()
+			(setq c-default-style "java"
+				  tab-width 2
+                  indent-tabs-mode nil)))
 
 ;;; LUA CONFIGURATION ;;;
 (use-package lua-mode
@@ -238,7 +233,7 @@
 
 (defun rk/rustic-mode-hook ()
   ;; so that run C-c C-c C-r works without having to confirm
- (setq-local buffer-save-without-query t))
+  (setq-local buffer-save-without-query t))
 
 ;; sml
 (use-package sml-mode
@@ -252,6 +247,8 @@
 ;; lsp stuff
 (use-package lsp-mode
   :commands lsp
+  :hook
+  ((go-mode) . lsp)
   :custom
   (lsp-keymap-prefix "C-c C-l")
   (lsp-log-io nil) ;; only turn on if you need to debug lsp
@@ -267,14 +264,8 @@
   (lsp-rust-analyzer-macro-expansion-method (quote rustic-analyzer-macro-expand))
   (lsp-rust-full-docs t)
   :config
-
   (add-hook 'lsp-mode-hook 'lsp-ui-mode)
-
-  ;; go setup
-  (add-hook 'go-mode-hook #'lsp-deferred)
-  (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
-  :hook
-  (lsp-mode . lsp-enable-which-key-integration))
+  (lsp-enable-which-key-integration t))
 
 (use-package lsp-ui
   :defer t
@@ -297,20 +288,20 @@
   ;; (company-begin-commands nil) ;; uncomment to disable popup
   :bind
   (:map company-active-map
-	("C-n". company-select-next)
-	("C-p". company-select-previous)
-	("M-<". company-select-first)
-	("M->". company-select-last)))
+		("C-n". company-select-next)
+		("C-p". company-select-previous)
+		("M-<". company-select-first)
+		("M->". company-select-last)))
 
 ;; lsp's rust company mode requires yasnippet for code completion
 (use-package yasnippet
-  :defer t
   :diminish
   :config
   ;; Need this if we only use yas-minor-mode.
   ;; Will load the snippet table before yas-minor-mode is called
   (yas-reload-all)
-  (add-hook 'rustic-mode-hook #'yas-minor-mode))
+  (add-hook 'rustic-mode-hook #'yas-minor-mode)
+  (add-hook 'go-mode-hook #'yas-minor-mode))
 
 (use-package nov
   :defer t
@@ -323,35 +314,34 @@
 ;; modus-themes
 ;; vscode-dark-plus-theme
 ;; naysayer-theme
-;; (use-package modus-themes
-;;   :init
-;;   (modus-themes-load-themes)
-;;   :config
-;;   (modus-themes-load-vivendi) ;; OR (modus-themes-load-vivendi)
-;;   :bind ("<f5>" . modus-themes-toggle))
+(use-package modus-themes
+  :init
+  (modus-themes-load-themes)
+  :config
+  (modus-themes-load-vivendi) ;; OR (modus-themes-load-vivendi)
+  :bind ("<f5>" . modus-themes-toggle))
 
 ;; naysayer theme is based on jon blow's theme, I really like it
 ;; cause it uses green for comments, which makes it easier to read
 ;; than light grey in modus-themes
-(use-package naysayer-theme
-  :config
-  (load-theme 'naysayer t)
-  (set-cursor-color "lightgreen"))
+;;(use-package naysayer-theme
+;;  :config
+;;  (load-theme 'naysayer t)
+;;  (set-cursor-color "lightgreen"))
 
+(defun my-org-hook ()
+  (setq fill-column 80)
+  (auto-fill-mode 1))
 (use-package org
   :config
   (setq org-startup-indented t)
-  (setq fill-column 80)
   :hook
-  (auto-fill-mode))
+  (org-mode . my-org-hook))
 
 ;; Linux specific settings
 (when (string-equal system-type 'gnu/linux)
   (progn
-    (use-package pdf-tools
-      :config
-      (require 'pdf-continuous-scroll-mode)
-      (add-hook 'pdf-view-mode-hook 'pdf-continuous-scroll-mode))
+    (use-package pdf-tools)
     (use-package vterm)))
 
 ;; macOS specific settings
@@ -359,8 +349,8 @@
   (progn
     ;; sets option key to 'alt, command key to 'meta
     (setq mac-option-modifier 'alt
-	  mac-right-option-modifier 'alt
-	  mac-command-modifier 'meta)
+		  mac-right-option-modifier 'alt
+		  mac-command-modifier 'meta)
     ;; sets fn-delete to be right-delete
     (global-set-key [kp-delete] 'delete-char)))
 
