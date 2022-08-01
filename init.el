@@ -76,7 +76,9 @@
   (show-paren-mode 1))
 
 ;; display line numbers for text and programming mode buffers only
-(global-display-line-numbers-mode 1)
+;; so we avoid situations like vterm having line numbers
+(add-hook 'text-mode-hook #'display-line-numbers-mode)
+(add-hook 'prog-mode-hook #'display-line-numbers-mode)
 (global-hl-line-mode 1)
 
 ;; maximized frame when create
