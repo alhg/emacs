@@ -12,7 +12,7 @@
 ;;; PACKAGE CONFIGURATION ;;;
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
-						 ("elpa" . "https://elpa.gnu.org/packages/")))
+			 ("elpa" . "https://elpa.gnu.org/packages/")))
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
@@ -40,7 +40,12 @@
 (use-package diminish)
 
 ;; Get PATH from shell
-(exec-path-from-shell-initialize)
+(use-package exec-path-from-shell
+  :config
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize))
+  (when (daemonp)
+    (exec-path-from-shell-initialize)))
 
 ;;; GENERAL CONFIGURATION ;;;
 ;; place emacs generated custom settings to another file
