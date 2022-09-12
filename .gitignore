@@ -1,4 +1,5 @@
 # directories
+.cache/
 auto-save-list/
 eln-cache/
 elpa/
@@ -9,15 +10,18 @@ server/
 racket-mode/
 transient/
 url/
+var/
 
 
 # files
 \#*\#
+.lsp-eslint-choices
 .lsp-session-v1
 bookmarks
 custom.el
 history
 nov-places
 projects
+recentf
 session.*
 tramp

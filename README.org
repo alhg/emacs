@@ -1,0 +1,11 @@
+* alhg's .emacs file
+
+Welcome to my emacs file.
+
+
+* TODO/Ideas/bugs
+- [TODO] Split up my init.el into multiple files for organization
+- [TODO] Figure out the common lsp commands used and map them to make more convenient keybindings
+  - Mainly need to figure out how to display doc information
+- [Idea] (Crazy) Use evil modal keybindings, but when in insert use emacs keybindings instead.
+  - Probably not worth it, could get confusing using vim & emacs at the same time.

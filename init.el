@@ -1,18 +1,16 @@
-;; TODOs
-;; - Print Emacs startup time in scratch buffer.
-;; - Allow timer to be set in modeline, when timer ends emacs could flash buffer
-;;   or modeline background color
-;; - Setup Emacs for web development. Currently using vscode, but would like to switch
-;;   - Need to dynamically change exec-path to current project's node_modules.
-;;     Theres a project for it.
-;;   - Eslint, prettier buffer save on format should only work with project's config
-;;   - No tabs when editing js/ts files
-;;   - Setup typescript integration
+;; Some basic settings
+(setq frame-title-format '("%b"))
+(setq ring-bell-function 'ignore)
+(setq use-short-answers t)
+
+(setq initial-buffer-choice t) ; always start with *scratch*
+
+(setq switch-to-buffer-obey-display-actions t)
 
 ;;; PACKAGE CONFIGURATION ;;;
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
-			 ("elpa" . "https://elpa.gnu.org/packages/")))
+						 ("elpa" . "https://elpa.gnu.org/packages/")))
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
@@ -52,21 +50,12 @@
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file 'noerror)
 
-;; disable startup splash & message buffers
-(setq inhibit-splash-screen t
-      inhibit-startup-echo-area-message t)
-
-;; ask before killing emacs
-(setq confirm-kill-emacs 'y-or-n-p)
 
 ;; turn off annoyances
-(setq ring-bell-function 'ignore) ;; turn off all bells
-;;(setq visible-bell nil)         ;; toggle between audio/video bells
 (setq make-backup-files nil)
 (setq auto-save-default nil)
-(fset 'yes-or-no-p 'y-or-n-p)     ;; simplify Yes/No Prompts
 
-(transient-mark-mode 1) ;; highlight area when setting mark
+(transient-mark-mode +1) ;; highlight area when setting mark
 
 (setq blink-cursor-interval 0)
 
@@ -80,15 +69,12 @@
 		show-paren-when-point-in-periphery t)
   (show-paren-mode 1))
 
-;; display line numbers for text and programming mode buffers only
-;; so we avoid situations like vterm having line numbers
+;; display line numbers & highlight line for text and programming mode
+;; buffers only so we avoid situations like vterm having line numbers/highlight line
+;;(setq display-line-numbers 'relative)
 (add-hook 'text-mode-hook #'display-line-numbers-mode)
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
-(global-hl-line-mode 1)
-
-;; maximized frame when create
-;;(add-to-list 'initial-frame-alist '(fullscreen . maximized)) ;; only maximize inital frame          
-(add-to-list 'default-frame-alist '(fullscreen . maximized)) ;; maximize all frames created
+(global-hl-line-mode +1)
 
 ;; show extra information on modeline
 (setq-default column-number-mode t)
@@ -129,23 +115,38 @@
 (use-package which-key
   :diminish
   :config
-  (which-key-mode))
+  (which-key-mode +1))
 
 ;; fido is ido-like mode that has vertical-mode
-(fido-vertical-mode 1)
+;;(fido-vertical-mode 1)
+;;(fido-vertical-mode -1)
 
-;; package for extra info on completion menu
-(use-package marginalia
-  :custom
-  (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
+(use-package selectrum
   :config
-  (marginalia-mode))
+  (selectrum-mode +1))
 
+(use-package selectrum-prescient
+  :config
+  ;; make sorting and filtering more intelligent, using frequency and recency
+  (selectrum-prescient-mode +1)
+  ;; saves command history to disk, to improve sorting
+  (prescient-persist-mode +1))
+
+;; Enable rich annotations using the Marginalia package
+(use-package marginalia
+  :init
+  (marginalia-mode 1))
+
+;; Add pulse on line of cursor when it jumps vertically or to windows.
+;; Helps visually know where the cursor is more quickly
+(use-package pulsar
+  :config
+  (pulsar-global-mode 1))
 
 ;; TODO: Do I need this package?
 (use-package savehist
   :config
-  (savehist-mode))
+  (savehist-mode +1))
 
 ;; Best git interface
 (use-package magit
@@ -153,12 +154,13 @@
   (git-commit-summary-max-length 50)
   (git-commit-fill-column 72)
   :config
+  (remove-hook 'magit-status-headers-hook 'magit-insert-tags-header)
   (global-git-commit-mode 1))
 
 ;; isearch replacement
-(use-package ctrlf
-  :config
-  (ctrlf-mode +1))
+;; (use-package ctrlf
+;;   :config
+;;   (ctrlf-mode 1))
 
 (use-package flycheck)
 ;;  :init
@@ -183,6 +185,7 @@
 
 ;; go stuff
 (use-package go-mode
+  :defer t
   :hook (before-save . gofmt-before-save))
 
 ;; Go - lsp-mode
@@ -221,74 +224,110 @@
   :defer t)
 
 ;; rust stuff
-(use-package rustic
-  :defer t
-  :bind (:map rustic-mode-map
-              ("M-j" . lsp-ui-imenu)
-              ("M-?" . lsp-find-references)
-              ("C-c C-c l" . flycheck-list-errors)
-              ("C-c C-c a" . lsp-execute-code-action)
-              ("C-c C-c r" . lsp-rename)
-              ("C-c C-c q" . lsp-workspace-restart)
-              ("C-c C-c Q" . lsp-workspace-shutdown)
-              ("C-c C-c s" . lsp-rust-analyzer-status))
-  :config
-  ;; uncomment for less flashiness
-  (setq lsp-eldoc-hook nil)
-  (setq lsp-enable-symbol-highlighting nil)
-  (setq lsp-signature-auto-activate nil)
+;; (use-package rustic
+;;   :defer t
+;;   :bind (:map rustic-mode-map
+;;               ("M-j" . lsp-ui-imenu)
+;;               ("M-?" . lsp-find-references)
+;;               ("C-c C-c l" . flycheck-list-errors)
+;;               ("C-c C-c a" . lsp-execute-code-action)
+;;               ("C-c C-c r" . lsp-rename)
+;;               ("C-c C-c q" . lsp-workspace-restart)
+;;               ("C-c C-c Q" . lsp-workspace-shutdown)
+;;               ("C-c C-c s" . lsp-rust-analyzer-status))
+;;   :config
+;;   ;; uncomment for less flashiness
+;;   (setq lsp-eldoc-hook nil)
+;;   (setq lsp-enable-symbol-highlighting nil)
+;;   (setq lsp-signature-auto-activate nil)
 
-  ;; comment to disable rustfmt on save
-  (setq rustic-format-on-save t)
-  (add-hook 'rustic-mode-hook 'rk/rustic-mode-hook))
+;;   ;; comment to disable rustfmt on save
+;;   (setq rustic-format-on-save t)
+;;   ;; Default is pop-to-buffer, but I don't like cursor switching to other buffer.
+;;   (setq rustic-format-display-method 'display-buffer)
+;;   (add-hook 'rustic-mode-hook 'rk/rustic-mode-hook))
 
-(defun rk/rustic-mode-hook ()
-  ;; so that run C-c C-c C-r works without having to confirm
-  (setq-local buffer-save-without-query t))
+;; (defun rk/rustic-mode-hook ()
+;;   ;; so that run C-c C-c C-r works without having to confirm
+;;   (setq-local buffer-save-without-query t))
 
 ;; sml
 (use-package sml-mode
   :defer t)
+
+;; Web Stuff
+;; Typescript
+(use-package typescript-mode
+  :config
+  (setq typescript-indent-level 2))
+;; (use-package tide
+;;   :after (typescript-mode company flycheck)
+;;   :config
+;;   (add-hook 'typescript-mode-hook #'setup-tide-mode)
+;;   (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode)))
+
+;; (defun setup-tide-mode ()
+;;   (interactive)
+;;   (setq typescript-indent-level 2)
+;;   (tide-setup)
+;;   (flycheck-mode 1)
+;;   (setq flycheck-check-syntax-automatically '(save mode-enabled))
+;;   (eldoc-mode 1)
+;;   (tide-hl-identifier-mode 1)
+;;   (company-mode 1)
+;;   (prettier-mode 1))
+
+
+;; ;; Prettier
+;; (use-package prettier)
 
 ;; zig
 (use-package zig-mode
   :defer t
   :mode ("\\.zig\\'" . zig-mode))
 
+;; elgot
+
 ;; lsp stuff
-(use-package lsp-mode
-  :commands lsp
-  :hook
-  ((go-mode) . lsp)
-  :custom
-  (lsp-keymap-prefix "C-c C-l")
-  (lsp-log-io nil) ;; only turn on if you need to debug lsp
-  (lsp-eldoc-render-all t)
-  (lsp-idle-delay 0.6)
+;; (use-package lsp-mode
+;;   :commands (lsp lsp-deferred)
+;;   :hook
+;;   ((go-mode . lsp-deferred)
+;;    (lsp-mode . lsp-enable-which-key-integration))
 
-  ;; Rust
-  ;; what to use when checking on-save. "check" is default, I prefer clippy
-  (lsp-rust-analyzer-cargo-watch-command "clippy")
-  (lsp-rust-analyzer-display-chaining-hints t)
-  (lsp-rust-analyzer-display-parameter-hints nil) ;; super annoying, interrupts editing
-  (lsp-rust-analyzer-server-display-inlay-hints nil)
-  (lsp-rust-analyzer-macro-expansion-method (quote rustic-analyzer-macro-expand))
-  (lsp-rust-full-docs t)
-  :config
-  (add-hook 'lsp-mode-hook 'lsp-ui-mode)
-  (lsp-enable-which-key-integration t))
+;;   :custom
+;;   (lsp-keymap-prefix "C-c C-l")
+;;   (lsp-log-io nil) ;; only turn on if you need to debug lsp
+;;   (lsp-eldoc-render-all t)
+;;   (lsp-idle-delay 0.6)
 
-(use-package lsp-ui
-  :defer t
-  :diminish
-  :commands lsp-ui-mode
-  :custom
-  ;;(lsp-ui-peek-always-show t)
-  ;;(lsp-ui-sideline-show-hover t)xo
-  (lsp-ui-doc-enable nil)
-  ;;(lsp-ui-doc-alignment (quote window))
-  ;;(lsp-ui-doc-position (quote top))
-  )
+;;   ;; Rust
+;;   ;; what to use when checking on-save. "check" is default, I prefer clippy
+;;   (lsp-rust-analyzer-cargo-watch-command "clippy")
+;;   (lsp-rust-analyzer-display-chaining-hints t)
+;;   (lsp-rust-analyzer-display-parameter-hints nil) ;; super annoying, interrupts editing
+;;   (lsp-rust-analyzer-server-display-inlay-hints nil)
+;;   (lsp-rust-analyzer-macro-expansion-method (quote rustic-analyzer-macro-expand))
+;;   (lsp-rust-full-docs t)
+
+;;   :init
+;;   (setq lsp-keymap-prefix "C-c l")
+
+;;   :config
+;;   (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+
+
+;; (use-package lsp-ui
+;;   :defer t
+;;   :diminish
+;;   :commands lsp-ui-mode
+;;   :custom
+;;   ;;(lsp-ui-peek-always-show t)
+;;   ;;(lsp-ui-sideline-show-hover t)xo
+;;   (lsp-ui-doc-enable nil)
+;;   ;;(lsp-ui-doc-alignment (quote window))
+;;   ;;(lsp-ui-doc-position (quote top))
+;;   )
 
 ;; code completion
 (use-package company
@@ -305,14 +344,14 @@
 		("M->". company-select-last)))
 
 ;; lsp's rust company mode requires yasnippet for code completion
-(use-package yasnippet
-  :diminish
-  :config
-  ;; Need this if we only use yas-minor-mode.
-  ;; Will load the snippet table before yas-minor-mode is called
-  (yas-reload-all)
-  (add-hook 'rustic-mode-hook #'yas-minor-mode)
-  (add-hook 'go-mode-hook #'yas-minor-mode))
+;; (use-package yasnippet
+;;   :diminish
+;;   :config
+;;   ;; Need this if we only use yas-minor-mode.
+;;   ;; Will load the snippet table before yas-minor-mode is called
+;;   (yas-reload-all)
+;;   (add-hook 'rustic-mode-hook #'yas-minor-mode)
+;;   (add-hook 'go-mode-hook #'yas-minor-mode))
 
 (use-package nov
   :defer t
@@ -321,16 +360,29 @@
   :config
   (setq nov-text-width 80))
 
+;; Frame background transperancy
+;;(set-frame-parameter (selected-frame) 'alpha '(90 90)) ;; set current frame alpha
+;;(add-to-list 'default-frame-alist '(alpha 90 90)) ;; set a default alpha for new frames
+
 ;; Themes
 ;; modus-themes
+;; ef-themes
 ;; vscode-dark-plus-theme
 ;; naysayer-theme
 (use-package modus-themes
+  :bind ("<f5>" . modus-themes-toggle)
   :init
   (modus-themes-load-themes)
   :config
-  (modus-themes-load-vivendi) ;; OR (modus-themes-load-vivendi)
-  :bind ("<f5>" . modus-themes-toggle))
+  ;; OR (modus-themes-load-vivendi)
+  (modus-themes-load-vivendi))
+
+;; (use-package ef-themes
+;;   :bind ("<f6>" . ef-themes-toggle)
+;;   :init
+;;   Disable all other themes to avoid awkward blending:
+;;   (mapc #'disable-theme custom-enabled-themes))
+;;   )
 
 ;; naysayer theme is based on jon blow's theme, I really like it
 ;; cause it uses green for comments, which makes it easier to read
@@ -340,8 +392,29 @@
 ;;  (load-theme 'naysayer t)
 ;;  (set-cursor-color "lightgreen"))
 
+;; timer package, provides timer functionality
+(use-package tmr
+  :init
+  ;; set to nil to disable the sound
+  (setq tmr-sound-file "/usr/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga")
+  (setq tmr-notification-urgency 'normal)
+  ;; Read the `tmr-descriptions-list' doc string
+  (setq tmr-descriptions-list 'tmr-description-history)
+
+  ;; set keybindins
+  (let ((map global-map))
+	(define-key map (kbd "C-c t t") #'tmr)
+	(define-key map (kbd "C-c t T") #'tmr-with-description)
+	(define-key map (kbd "C-c t l") #'tmr-tabulated-view) ; "list timers" mnemonic
+	(define-key map (kbd "C-c t c") #'tmr-clone)
+	(define-key map (kbd "C-c t k") #'tmr-cancel)
+	(define-key map (kbd "C-c t s") #'tmr-reschedule)
+	(define-key map (kbd "C-c t e") #'tmr-edit-description)
+	(define-key map (kbd "C-c t r") #'tmr-remove)
+	(define-key map (kbd "C-c t R") #'tmr-remove-finished)))
+
 (defun my-org-hook ()
-  (setq fill-column 80)
+  (setq fill-column 100)
   (auto-fill-mode 1))
 (use-package org
   :config
