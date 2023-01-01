@@ -28,6 +28,7 @@
 (require 'init-themes)     ;; emacs theme settings
 (require 'init-ui)         ;; emacs ui settings
 (require 'init-windows-nt) ;; windows-nt specific settings
+(require 'init-mac-os)     ;; macOS specific settings
 
 ;; third-party plugin configs
 (require 'init-terminal) ;; terminal emulation
