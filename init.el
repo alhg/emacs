@@ -31,9 +31,10 @@
 (require 'init-mac-os)     ;; macOS specific settings
 
 ;; third-party plugin configs
-(require 'init-terminal) ;; terminal emulation
-(require 'init-magit)    ;; git interface
-(require 'init-nov)      ;; read .epub files
+(require 'init-completion) ;; minibuffer completion
+(require 'init-terminal)   ;; terminal emulation
+(require 'init-magit)      ;; git interface
+(require 'init-nov)        ;; read .epub files
 
 ;; programming modes
-(require 'init-rust-mode) ;; rust programming language
+(require 'init-rust-mode)  ;; rust programming language
