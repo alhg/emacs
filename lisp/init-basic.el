@@ -8,6 +8,12 @@
 
 ;; t makes pop new buffers to a display buffer or rules specified by
 ;; ‘display-buffer-overriding-action’, ‘display-buffer-alist’, etc.
-(setq switch-to-buffer-obey-display-actions t) 
+(setq switch-to-buffer-obey-display-actions t)
+
+;; get $PATH into emacs GUI
+(use-package exec-path-from-shell
+  :config
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize)))
 
 (provide 'init-basic)
