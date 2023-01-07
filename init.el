@@ -37,4 +37,5 @@
 (require 'init-nov)        ;; read .epub files
 
 ;; programming modes
+(require 'init-eglot)      ;; lsp configuration
 (require 'init-rust-mode)  ;; rust programming language

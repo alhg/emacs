@@ -10,6 +10,11 @@
 ;; ‘display-buffer-overriding-action’, ‘display-buffer-alist’, etc.
 (setq switch-to-buffer-obey-display-actions t)
 
+;; turn on settings for all programming modes
+(add-hook 'prog-mode-hook
+	  (lambda ()
+	    (electric-pair-local-mode +1)))
+
 ;; get $PATH into emacs GUI
 (use-package exec-path-from-shell
   :config
