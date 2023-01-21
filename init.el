@@ -34,6 +34,7 @@
 (require 'init-completion) ;; minibuffer completion
 (require 'init-terminal)   ;; terminal emulation
 (require 'init-magit)      ;; git interface
+(require 'init-org)        ;; org
 (require 'init-nov)        ;; read .epub files
 
 ;; programming modes

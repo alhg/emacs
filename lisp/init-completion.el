@@ -1,16 +1,13 @@
 (use-package vertico
   :init
-  (vertico-mode +1)
-  ;; Enable cycling for `vertico-next' and `vertico-previous'.
-  ;;(setq vertico-cycle t)
-  )
+  (vertico-mode +1))
 
 ;; Persist history after restart. Vertico sorts by history position.
 (use-package savehist
   :init
   (savehist-mode +1))
 
-;; Adds annotations to completions
+;; Adds annotation to completions entries
 (use-package marginalia
   ;; Turns marginalia on/off
   :bind (("M-A" . marginalia-cycle)
@@ -36,5 +33,11 @@
 
   :init
   (global-corfu-mode))
+
+;; Use orderless for fuzzy finding completions
+(use-package orderless
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles basic partial-completion)))))
 
 (provide 'init-completion)
