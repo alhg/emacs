@@ -38,5 +38,8 @@
 (require 'init-nov)        ;; read .epub files
 
 ;; programming modes
-(require 'init-eglot)      ;; lsp configuration
-(require 'init-rust-mode)  ;; rust programming language
+(require 'init-eglot)       ;; lsp configuration
+(require 'init-go-mode)     ;; go programming language
+(require 'init-python-mode) ;; Python programming language
+(require 'init-rust-mode)   ;; Rust programming language
+(require 'init-zig-mode)    ;; Zig programming language
