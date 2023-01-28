@@ -36,6 +36,7 @@
 (require 'init-magit)      ;; git interface
 (require 'init-org)        ;; org
 (require 'init-nov)        ;; read .epub files
+(require 'init-tmr)        ;; timer
 
 ;; programming modes
 (require 'init-eglot)       ;; lsp configuration
