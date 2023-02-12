@@ -1,3 +1,3 @@
 (use-package tmr)
 
-(provide 'init-tmr)
+(provide 'init-timer)
