@@ -29,6 +29,7 @@
 (require 'init-ui)         ;; emacs ui settings
 (require 'init-windows-nt) ;; windows-nt specific settings
 (require 'init-mac-os)     ;; macOS specific settings
+(require 'init-evil)       ;; vim keybindings
 
 ;; third-party plugin configs
 (require 'init-completion) ;; minibuffer completion
@@ -42,5 +43,6 @@
 (require 'init-eglot)       ;; lsp configuration
 (require 'init-go-mode)     ;; go programming language
 (require 'init-python-mode) ;; Python programming language
+(require 'init-racket-mode) ;; Racket programming language
 (require 'init-rust-mode)   ;; Rust programming language
 (require 'init-zig-mode)    ;; Zig programming language
