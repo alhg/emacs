@@ -1,4 +1,5 @@
 ;; bootstrap straight.el package manager
+(setq straight-repository-branch "develop") ;; [2023-03-26] currently needed because of fix for emacs 29+ for native compilation error
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -12,6 +13,9 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
+;; tell emacs to use latest emacs instead of built-in
+(straight-use-package 'org)
+
 ;; have use-package with straight.el
 (straight-use-package 'use-package)
 
@@ -19,7 +23,6 @@
 ;; no more :straight t
 (use-package straight
   :custom (straight-use-package-by-default t))
-
 
 ;; add lisp/ directory
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
