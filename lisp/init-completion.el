@@ -1,3 +1,9 @@
+;;; init-completion.el --- Completion Configuration -*- lexical-binding: t -*-
+
+;;; Commentary:
+
+;;; Code:
+
 (use-package vertico
   :init
   (vertico-mode +1))
@@ -32,6 +38,8 @@
   :init
   (global-corfu-mode))
 
+(use-package corfu-terminal)
+
 ;; Use orderless for fuzzy finding completions
 (use-package orderless
   :custom
@@ -39,3 +47,5 @@
   (completion-category-overrides '((file (styles basic partial-completion)))))
 
 (provide 'init-completion)
+
+;;; init-completetion.el ends here

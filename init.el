@@ -1,5 +1,11 @@
+;;; init.el --- Emacs Config -*- lexical-binding: t -*-
+
+;;; Commentary:
+
+;;; Code:
+
 ;; bootstrap straight.el package manager
-(setq straight-repository-branch "develop") ;; [2023-03-26] currently needed because of fix for emacs 29+ for native compilation error
+;; (setq straight-repository-branch "develop") ;; sometimes needed if latest emacs breaks straight
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -14,39 +20,30 @@
   (load bootstrap-file nil 'nomessage))
 
 ;; tell emacs to use latest emacs instead of built-in
-(straight-use-package 'org)
+(condition-case nil
+    (straight-use-package 'org)
+  (error
+   (display-warning 'init "Could not install latest org-mode. Falling back to bundled version.")))
 
-;; have use-package with straight.el
+;; Have straight work with use-package macro for simple configuration
 (straight-use-package 'use-package)
 
-;; configure use-package to always use straight.el by default
-;; no more :straight t
+;; configure use-package to always use straight.el by default, no more :straight t
 (use-package straight
-  :custom (straight-use-package-by-default t))
+  :custom
+  (straight-use-package-by-default t))
 
 ;; add lisp/ directory
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
-;; general emacs config
-(require 'init-basic)      ;; basic emacs configuration settings
-(require 'init-themes)     ;; emacs theme settings
-(require 'init-ui)         ;; emacs ui settings
-(require 'init-windows-nt) ;; windows-nt specific settings
-(require 'init-mac-os)     ;; macOS specific settings
-(require 'init-evil)       ;; vim keybindings
 
-;; third-party plugin configs
-(require 'init-completion) ;; minibuffer completion
-(require 'init-terminal)   ;; terminal emulation
-(require 'init-magit)      ;; git interface
-(require 'init-markdown)   ;; markdown files
-(require 'init-nov)        ;; read .epub files
-(require 'init-org)        ;; org
-(require 'init-timer)      ;; timer
+(require 'init-general)     ;; general emacs configuration settings
+(require 'init-ui)          ;; emacs ui settings
+(require 'init-os)          ;; OS specific settings
+(require 'init-evil)        ;; vim keybindings
+(require 'init-programming) ;; programming configuration
+(require 'init-git)         ;; git interface
+(require 'init-completion)  ;; minibuffer completion
+(require 'init-terminal)    ;; terminal emulation
+(require 'init-misc)        ;; misc
 
-;; programming modes
-(require 'init-eglot)       ;; lsp configuration
-(require 'init-go-mode)     ;; go programming language
-(require 'init-python-mode) ;; Python programming language
-(require 'init-racket-mode) ;; Racket programming language
-(require 'init-rust-mode)   ;; Rust programming language
-(require 'init-zig-mode)    ;; Zig programming language
+;;; init.el ends here

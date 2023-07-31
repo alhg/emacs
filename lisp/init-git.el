@@ -1,3 +1,9 @@
+;;; init-git.el --- Git Configuration -*- lexical-binding: t -*-
+
+;;; Commentary:
+
+;;; Code:
+
 (use-package magit
   :custom
   (git-commit-summary-max-length 50)
@@ -8,4 +14,6 @@
   (add-hook 'git-commit-setup-hook 'toggle-frame-maximized t)
   (global-git-commit-mode 1))
 
-(provide 'init-magit)
+(provide 'init-git)
+
+;;; init-git ends here

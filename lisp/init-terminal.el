@@ -1,3 +1,9 @@
+;;; init-terminal.el --- Terminal Settings  -*- lexical-binding: t -*-
+
+;;; Commentary:
+
+;;; Code:
+
 ;; eat
 ;; "char" mode - Use C-M-m or M-RET to switch to semi-char mode
 ;; "semi-char" mode
@@ -18,3 +24,5 @@
 (use-package vterm)
 
 (provide 'init-terminal)
+
+;;; init-terminal.el ends here

@@ -1,3 +1,9 @@
+;;; init-general.el --- General Configuration  -*- lexical-binding: t -*-
+
+;;; Commentary:
+
+;;; Code:
+
 (setq ring-bell-function 'ignore) ;; 'ignore stops ring bell from working
 (setq use-short-answers t)        ;; changes 'yes-or-no-p to y-or-n-p (emacs 28.1+)
 
@@ -21,4 +27,13 @@
   (when (memq window-system '(mac ns x))
     (exec-path-from-shell-initialize)))
 
-(provide 'init-basic)
+;; keybinding changes
+(defun go-to-init-file ()
+  "Go to emacs user init file"
+  (interactive)
+  (find-file user-init-file))
+(global-set-key (kbd "C-c i") 'go-to-init-file)
+
+(provide 'init-general)
+
+;;; init-general.el ends here
