@@ -11,15 +11,21 @@
 ;; "emacs" mode
 ;;   - C-c C-j to switch to semi-char mode
 ;;   - C-c M-d to switch to char mode
-(straight-use-package
- '(eat :type git
-       :host codeberg
-       :repo "akib/emacs-eat"
-       :files ("*.el" ("term" "term/*.el") "*.texi"
-               "*.ti" ("terminfo/e" "terminfo/e/*")
-               ("terminfo/65" "terminfo/65/*")
-               ("integration" "integration/*")
-               (:exclude ".dir-locals.el" "*-tests.el"))))
+(use-package eat
+  ;; :hook
+  ;; (eshell-load-hook . 'eat-eshell-mode)
+  ;; :config
+  ;; (setq eshell-visual-commands '())
+  )
+
+;; (use-package eshell
+;;   :after eat
+;;   :hook
+;;   (eshell-load-hook . 'eat-eshell-mode)
+;;   :config
+;;   ;; now that we use eat-eshell-mode, eshell won't need to send
+;;   ;; visual commands to term-mode
+;;   (setq eshell-visual-commands '()))
 
 (use-package vterm)
 

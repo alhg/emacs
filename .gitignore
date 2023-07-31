@@ -1,6 +1,7 @@
 # directories
 .cache/
 auto-save-list/
+detached/
 eln-cache/
 elpa/
 eshell/

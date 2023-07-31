@@ -1,2 +1,9 @@
 Welcome to my emacs file.
 
+* Dependencies
+  - cmake       :: vterm
+  - libtool-bin :: vterm
+  - libvterm    :: vterm
+  - dtach       :: so emacs can dtach shell sessions with detached.el
+  - ripgrep     :: so emacs can go fast search with projectile-riprep and rg.el
+
