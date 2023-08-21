@@ -27,7 +27,9 @@
 ;;   ;; visual commands to term-mode
 ;;   (setq eshell-visual-commands '()))
 
-(use-package vterm)
+;; vterm isn't available on windows
+(if (or (string-equal system-type 'darwin) (string-equal system-type "gnu/linux"))
+    (use-package vterm))
 
 (provide 'init-terminal)
 
