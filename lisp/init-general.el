@@ -16,9 +16,14 @@
 ;; ‘display-buffer-overriding-action’, ‘display-buffer-alist’, etc.
 (setq switch-to-buffer-obey-display-actions t)
 
-;; turn on settings for all programming modes
+;; turn on default settings for text modes.
+(add-hook 'text-mode-hook
+	  (lambda ()
+	    (setq show-trailing-whitespace t)))
+;; turn on default settings for  programming modes.
 (add-hook 'prog-mode-hook
 	  (lambda ()
+	    (setq show-trailing-whitespace t)
 	    (electric-pair-local-mode +1)))
 
 ;; get $PATH into emacs GUI
