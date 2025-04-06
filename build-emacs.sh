@@ -9,8 +9,7 @@ apt-get update && apt-get install -y \
 	librsvg2-dev \
 	libgnutls28-dev \
 	libnurses libncurses-dev \
-	libsystemd-dev \
-	libjannson libjannson-dev
+	libsystemd-dev
 
 # install emacs documentations & info manuals
 apt-get install -y emacs-common-non-dfsg
@@ -18,12 +17,10 @@ apt-get install -y emacs-common-non-dfsg
 ./autogen.sh
 ./configure --with-native-compilation \
 	--with-mailutils \
-	--with-x-toolkit=gtk3 \
-	--with-x=yes \
 	--with-modules \
 	--with-mailutils \
 	--with-file-notification=inotify
-make -j8
+make -j$(nproc)
 sudo make install
 # sudo make uninstall
 
