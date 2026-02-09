@@ -7,14 +7,20 @@
 
 ;;; Code:
 
+
+;; CUDA configuration
+;; Use C++ mode for CUDA for now.
+(add-to-list 'auto-mode-alist '("\\.cu\\'" . c++-mode))
+
+
 ;; eldoc shows documentation in minibuffer or buffer.
 ;; eglot uses it by default to show docs.
 (use-package eldoc
   :config
   ;; prefer eldoc buffer over minibuffer
-  (setq eldoc-echo-area-prefer-doc-buffer t)
+  ;; (setq eldoc-echo-area-prefer-doc-buffer t)
   ;; limit eldoc's minibuffer expansion
-  (setq eldoc-echo-area-use-multiline-p 3))
+  (setq eldoc-echo-area-use-multiline-p 5))
 
 
 ;; 'elgot-ensure will setup eglot in mode, but I prefer to enable eglot manually
@@ -38,7 +44,10 @@
   ;; if server-initiated edits should be confirmed with user.
   ;;(eglot-confirm-server-initiated-edits nil)
   :config
-  (add-to-list 'eglot-server-programs '((rust-ts-mode rust-mode) "rust-analyzer")))
+  ;; turn off inlay hints for all lsp servers
+  (setq eglot-ignored-server-capabilities '(:inlayHintProvider))
+  (add-to-list 'eglot-server-programs '((c++-mode c++-ts-mode) "clangd"))
+  (add-to-list 'eglot-server-programs '((rust-mode rust-ts-mode) "rust-analyzer")))
 
 
 ;; Go configuration
