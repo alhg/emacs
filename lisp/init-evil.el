@@ -5,9 +5,11 @@
 ;;; Code:
 
 (use-package evil
-  :config
+  :init
+  (setq evil-want-keybinding nil)
+  ;;:config
   ;; disable vim keybindings in insert mode
-  (setq evil-disable-insert-state-bindings t)
+  ;;(setq evil-disable-insert-state-bindings t)
   ;;(evil-mode +1)
   )
 
